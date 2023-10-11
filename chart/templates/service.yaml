@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-bgis
+spec:
+  selector:
+    app: hello-bgis
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-bgis
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-bgis
+  template:
+    metadata:
+      labels:
+        app: hello-bgis
+    spec:
+      containers:
+        - name: hello-bgis
+          image: {{ .Values.image.name }}:{{ .Values.image.tag }}
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: ENDPOINT
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-creds
+                  key: endpoint
+            - name: BUCKET_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-creds
+                  key: bucketName
+            - name: ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-creds
+                  key: accessKey
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: bucket-creds
+                  key: secretKey
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-bgis-ingress
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: {{ .Values.host }}
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: hello-bgis
+            port:
+              number: 80

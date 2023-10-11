@@ -1,0 +1,26 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: hello-bgis
+  annotations:
+    argocd/app-name: hello-bgis
+    grafana/dashboard-selector: hello-bgis
+    prometheus.io/alert: 'hello-bgis-ServiceDown'
+    github.com/project-slug: 'modridi/hello-bgis'
+  links:
+    - url: http://hello-bgis.apps.kind-cluster.172-20-0-100.nip.io
+      title: Home page
+spec:
+  type: service
+  lifecycle: experimental
+  owner: group:default/guests
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: hello-bgis
+spec:
+  type: s3-bucket
+  owner: group:default/guests
+  dependencyOf:
+  - component:default/hello-bgis

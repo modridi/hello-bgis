@@ -1,0 +1,10 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: hello-bgis-alerts
+spec:
+  groups:
+  - name: hello-bgis-alerts
+    rules:
+    - alert: hello-bgis-ServiceDown
+      expr: probe_success{target="hello-bgis-health"} != 1

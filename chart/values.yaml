@@ -1,0 +1,13 @@
+prometheus-blackbox-exporter:
+  serviceMonitor:
+    enabled: true
+    targets:
+      - name: hello-bgis-health
+        url: http://hello-bgis
+        interval: 30s
+        module: http_2xx
+
+image:
+  name: ghcr.io/modridi/hello-bgis
+  tag: latest
+  host: place_holder
